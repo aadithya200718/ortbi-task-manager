@@ -1,3 +1,5 @@
+import { validateJwtSecret } from './auth/utils/jwt-secret.validator';
+import { validateJwtExpiresIn } from './auth/utils/jwt-expires-in.validator';
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -10,6 +12,8 @@ import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
+  validateJwtSecret(configService.get<string>('JWT_SECRET'));
+  validateJwtExpiresIn(configService.get<string>('JWT_EXPIRES_IN'));
 
   // Security Headers
   app.use(
@@ -46,6 +50,16 @@ async function bootstrap() {
     .setTitle('Orbit API')
     .setDescription('REST API for Orbit Project & Task Manager')
     .setVersion('1.0')
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        name: 'Authorization',
+        in: 'header',
+      },
+      'bearer',
+    )
     .build();
   const document = SwaggerModule.createDocument(app, swaggerConfig);
   SwaggerModule.setup('api/docs', app, document);

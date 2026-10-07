@@ -58,6 +58,7 @@ model Project {
 
   @@index([userId])
   @@index([status])
+  @@unique([id, userId])
   @@map("projects")
 }
 
