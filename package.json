@@ -1,0 +1,27 @@
+{
+  "name": "orbit-project-manager",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A secure cross-platform project and task management system built with Next.js, React Native, NestJS, and PostgreSQL.",
+  "scripts": {
+    "build": "pnpm -r --filter=!@orbit/mobile build",
+    "build:api": "pnpm --filter @orbit/api build",
+    "build:web": "pnpm --filter @orbit/web build",
+    "build:packages": "pnpm --filter @orbit/types build && pnpm --filter @orbit/validation build",
+    "dev:api": "pnpm --filter @orbit/api dev",
+    "dev:web": "pnpm --filter @orbit/web dev",
+    "dev:mobile": "pnpm --filter @orbit/mobile start",
+    "lint": "pnpm -r lint",
+    "lint:api": "pnpm --filter @orbit/api lint",
+    "lint:web": "pnpm --filter @orbit/web lint",
+    "lint:mobile": "pnpm --filter @orbit/mobile lint",
+    "typecheck": "pnpm -r typecheck",
+    "typecheck:api": "pnpm --filter @orbit/api typecheck",
+    "typecheck:web": "pnpm --filter @orbit/web typecheck",
+    "typecheck:mobile": "pnpm --filter @orbit/mobile typecheck",
+    "typecheck:packages": "pnpm --filter @orbit/types typecheck && pnpm --filter @orbit/validation typecheck"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3"
+  }
+}

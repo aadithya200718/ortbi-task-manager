@@ -1,0 +1,26 @@
+{
+  "expo": {
+    "name": "Orbit",
+    "slug": "orbit-task-manager",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "orbit",
+    "userInterfaceStyle": "automatic",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.orbit.taskmanager"
+    },
+    "android": {
+      "package": "com.orbit.taskmanager",
+      "adaptiveIcon": {
+        "backgroundColor": "#ffffff"
+      }
+    },
+    "plugins": [
+      "expo-router"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}
