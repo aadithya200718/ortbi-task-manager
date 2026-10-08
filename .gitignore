@@ -54,4 +54,6 @@ Thumbs.db
 
 # Local agent tooling
 .agents/
+.codex/
 skills-lock.json
+.neon
