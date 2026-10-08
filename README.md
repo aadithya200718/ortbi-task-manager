@@ -1,4 +1,4 @@
-# Orbit ? Project & Task Manager
+# Orbit — Project & Task Manager
 
 A secure, production-grade cross-platform project and task management system built with Next.js 16, React Native Expo SDK 57, NestJS, Prisma ORM, and PostgreSQL.
 
@@ -64,34 +64,34 @@ pnpm --filter @orbit/api exec prisma migrate status
 ### Core Endpoints
 
 #### Authentication (`/api/auth`)
-- `POST /api/auth/register` ? Register new user account.
+- `POST /api/auth/register` — Register new user account.
   - Enforces unique email, minimum 8 characters, and maximum 72 UTF-8 bytes (bcrypt limit).
-- `POST /api/auth/login` ? Authenticate and receive JWT access token.
+- `POST /api/auth/login` — Authenticate and receive JWT access token.
   - Enforces maximum 72 UTF-8 bytes.
-- `GET /api/auth/me` ? Fetch currently authenticated user profile (Bearer token required).
-- `POST /api/auth/logout` ? Stateless logout endpoint. Client discards token from `sessionStorage`.
+- `GET /api/auth/me` — Fetch currently authenticated user profile (Bearer token required).
+- `POST /api/auth/logout` — Stateless logout endpoint. Client discards token from `sessionStorage`.
 
 #### Projects (`/api/projects`)
-- `GET /api/projects` ? Paginated project listing with search, status filtering, and deterministic sorting (`orderBy: [{ [sortBy]: sortOrder }, { id: 'desc' }]`).
-- `POST /api/projects` ? Create project owned by caller (`userId` extracted from JWT).
-- `GET /api/projects/:id` ? Fetch project by ID (IDOR-protected).
-- `PUT /api/projects/:id` ? Update project with Serializable transaction isolation and date range validation.
-- `DELETE /api/projects/:id` ? Delete project. **Cascading behavior:** Deleting a project automatically deletes all child tasks via PostgreSQL `ON DELETE CASCADE`.
+- `GET /api/projects` — Paginated project listing with search, status filtering, and deterministic sorting (`orderBy: [{ [sortBy]: sortOrder }, { id: 'desc' }]`).
+- `POST /api/projects` — Create project owned by caller (`userId` extracted from JWT).
+- `GET /api/projects/:id` — Fetch project by ID (IDOR-protected).
+- `PUT /api/projects/:id` — Update project with Serializable transaction isolation and date range validation.
+- `DELETE /api/projects/:id` — Delete project. **Cascading behavior:** Deleting a project automatically deletes all child tasks via PostgreSQL `ON DELETE CASCADE`.
 
 #### Tasks (`/api/tasks`)
-- `GET /api/tasks` ? Paginated task list with project, status, priority filters and search.
-- `POST /api/tasks` ? Create task with atomic parent relation connection (`project: { connect: { id_userId } }`).
-- `GET /api/tasks/:id` ? Fetch task details with relational ownership verification.
-- `PUT /api/tasks/:id` ? Update task with Serializable transaction isolation.
+- `GET /api/tasks` — Paginated task list with project, status, priority filters and search.
+- `POST /api/tasks` — Create task with atomic parent relation connection (`project: { connect: { id_userId } }`).
+- `GET /api/tasks/:id` — Fetch task details with relational ownership verification.
+- `PUT /api/tasks/:id` — Update task with Serializable transaction isolation.
   - **Reassignment restriction:** Task `projectId` cannot be reassigned during updates.
   - **Completion Lifecycle:**
     - Transition to `COMPLETED`: sets `completedAt` to current timestamp.
     - Reopening to non-completed status: clears `completedAt` to `null`.
     - Unchanged `COMPLETED` status: preserves original `completedAt`.
-- `DELETE /api/tasks/:id` ? Delete task.
+- `DELETE /api/tasks/:id` — Delete task.
 
 #### Dashboard (`/api/dashboard`)
-- `GET /api/dashboard` ? Returns real-time user-scoped counts (`totalProjects`, `projectsNotStarted`, `projectsInProgress`, `projectsCompleted`, `totalTasks`, `pendingTasks`, `inProgressTasks`, `completedTasks`, `taskCompletionRate`).
+- `GET /api/dashboard` — Returns real-time user-scoped counts (`totalProjects`, `projectsNotStarted`, `projectsInProgress`, `projectsCompleted`, `totalTasks`, `pendingTasks`, `inProgressTasks`, `completedTasks`, `taskCompletionRate`).
 
 ---
 
@@ -115,7 +115,7 @@ pnpm --filter @orbit/api exec prisma migrate status
 
 ## Environment Configuration
 
-Create `.env` from `.env.example`:
+Copy `apps/api/.env.example` to `apps/api/.env` for the API. Put the public web API URL in `apps/web/.env.local`. Real `.env` files are ignored by Git.
 
 ```env
 # Database
@@ -127,6 +127,7 @@ JWT_SECRET=your_secure_256_bit_secret_here
 JWT_EXPIRES_IN=1h
 
 # Backend Configuration
+PORT=4000
 API_PORT=4000
 WEB_ORIGIN=http://localhost:3000
 
@@ -134,6 +135,58 @@ WEB_ORIGIN=http://localhost:3000
 NEXT_PUBLIC_API_URL=http://localhost:4000/api
 EXPO_PUBLIC_API_URL=http://localhost:4000/api
 ```
+
+`PORT` is the production-platform port and takes precedence. `API_PORT` remains the local fallback. `WEB_ORIGIN` must be the deployed web origin, without a trailing path. Public client API URLs must include the `/api` prefix.
+
+---
+
+## Local Setup
+
+Prerequisites: Node.js, pnpm, and PostgreSQL.
+
+```bash
+pnpm install
+cp apps/api/.env.example apps/api/.env
+```
+
+Create the development and test databases named by `DATABASE_URL` and `TEST_DATABASE_URL`, replace all placeholders in `apps/api/.env`, then generate the Prisma client and apply migrations:
+
+```bash
+pnpm --filter @orbit/api prisma:generate
+pnpm --filter @orbit/api exec prisma migrate deploy
+```
+
+Run the API and web client in separate terminals:
+
+```bash
+pnpm dev:api
+pnpm dev:web
+```
+
+For the Expo Android client, set `EXPO_PUBLIC_API_URL` to an API address reachable from the device or emulator, then run `pnpm dev:mobile`.
+
+---
+
+## Deployment
+
+### API
+
+1. Provision PostgreSQL and set `DATABASE_URL` to its production connection string.
+2. Set a strong, unique `JWT_SECRET`, plus `JWT_EXPIRES_IN`, `WEB_ORIGIN`, and the platform-provided `PORT`. Do not set `TEST_DATABASE_URL` in production unless the platform separately runs the test suite against an isolated database.
+3. Install dependencies with `pnpm install --frozen-lockfile`, generate the Prisma client with `pnpm --filter @orbit/api prisma:generate`, and build with `pnpm build:api`.
+4. Apply committed migrations with `pnpm --filter @orbit/api exec prisma migrate deploy`.
+5. Start with `pnpm --filter @orbit/api start:prod`.
+6. Configure the service health check to request `/api/health`.
+
+The API listens on `0.0.0.0` and prefers `PORT`, with `API_PORT` as a fallback.
+
+### Web
+
+1. Set `NEXT_PUBLIC_API_URL` to the public API base URL, including `/api`, before building.
+2. Build with `pnpm build:web`.
+3. Start with `pnpm --filter @orbit/web start`; the hosting platform may supply Next.js with its own `PORT`.
+
+Serve both applications over HTTPS. Set `WEB_ORIGIN` to the exact public web origin so browser requests pass CORS checks.
 
 ---
 
@@ -173,5 +226,4 @@ pnpm --filter @orbit/web build
 pnpm typecheck
 pnpm lint
 pnpm build
-pnpm peers check
 ```

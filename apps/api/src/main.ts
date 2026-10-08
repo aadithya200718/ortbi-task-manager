@@ -64,8 +64,10 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, swaggerConfig);
   SwaggerModule.setup('api/docs', app, document);
 
-  const port = configService.get<number>('API_PORT', 4000);
-  await app.listen(port);
+  // Most hosting platforms inject PORT. Keep API_PORT as a local-development
+  // fallback so existing environments continue to work unchanged.
+  const port = configService.get<number>('PORT') ?? configService.get<number>('API_PORT', 4000);
+  await app.listen(port, '0.0.0.0');
 
   Logger.log(`Orbit API running on http://localhost:${port}/api`, 'Bootstrap');
   Logger.log(`Swagger documentation available at http://localhost:${port}/api/docs`, 'Bootstrap');
