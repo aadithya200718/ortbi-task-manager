@@ -1,3 +1,4 @@
+import { ErrorResponseDto } from '../common/dto/error-response.dto';
 import { Controller, Get, UseGuards, HttpStatus } from '@nestjs/common';
 import {
   ApiTags,
@@ -32,6 +33,7 @@ export class DashboardController {
   @ApiResponse({
     status: HttpStatus.UNAUTHORIZED,
     description: 'Missing or invalid authentication token',
+    type: ErrorResponseDto,
   })
   async getStats(@CurrentUser() user: SafeUser): Promise<DashboardStatsDto> {
     return this.dashboardService.getStats(user.id);

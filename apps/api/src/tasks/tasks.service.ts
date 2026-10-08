@@ -229,7 +229,7 @@ export class TasksService {
 
         const isSerializationConflict =
           (error instanceof Prisma.PrismaClientKnownRequestError &&
-            error.code === 'P2034') ||
+            (error.code === 'P2034' || error.code === 'P2028')) ||
           (error instanceof Error &&
             error.message.includes(
               'could not serialize access due to read/write dependencies',

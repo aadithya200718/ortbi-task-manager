@@ -23,6 +23,8 @@ import { TasksService, PaginatedTasksResponse } from './tasks.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { TaskQueryDto } from './dto/task-query.dto';
+import { TaskResponseDto, PaginatedTasksResponseDto } from './dto/task-response.dto';
+import { ErrorResponseDto } from '../common/dto/error-response.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { SafeUser } from '../auth/auth.service';
@@ -41,18 +43,22 @@ export class TasksController {
   @ApiResponse({
     status: 201,
     description: 'Task successfully created',
+    type: TaskResponseDto,
   })
   @ApiResponse({
     status: 400,
     description: 'Validation failed or malformed input',
+    type: ErrorResponseDto,
   })
   @ApiResponse({
     status: 401,
     description: 'Missing or invalid authentication token',
+    type: ErrorResponseDto,
   })
   @ApiResponse({
     status: 404,
     description: 'Project not found or not owned by caller',
+    type: ErrorResponseDto,
   })
   async create(
     @CurrentUser() user: SafeUser,
@@ -66,10 +72,12 @@ export class TasksController {
   @ApiResponse({
     status: 200,
     description: 'Tasks retrieved successfully with pagination metadata',
+    type: PaginatedTasksResponseDto,
   })
   @ApiResponse({
     status: 401,
     description: 'Missing or invalid authentication token',
+    type: ErrorResponseDto,
   })
   async findAll(
     @CurrentUser() user: SafeUser,
@@ -84,18 +92,22 @@ export class TasksController {
   @ApiResponse({
     status: 200,
     description: 'Task details retrieved successfully',
+    type: TaskResponseDto,
   })
   @ApiResponse({
     status: 400,
     description: 'Malformed or invalid UUID',
+    type: ErrorResponseDto,
   })
   @ApiResponse({
     status: 401,
     description: 'Missing or invalid authentication token',
+    type: ErrorResponseDto,
   })
   @ApiResponse({
     status: 404,
     description: 'Task not found or parent project not owned by caller',
+    type: ErrorResponseDto,
   })
   async findById(
     @CurrentUser() user: SafeUser,
@@ -110,18 +122,27 @@ export class TasksController {
   @ApiResponse({
     status: 200,
     description: 'Task successfully updated',
+    type: TaskResponseDto,
   })
   @ApiResponse({
     status: 400,
     description: 'Validation failed or invalid input',
+    type: ErrorResponseDto,
   })
   @ApiResponse({
     status: 401,
     description: 'Missing or invalid authentication token',
+    type: ErrorResponseDto,
   })
   @ApiResponse({
     status: 404,
     description: 'Task not found or parent project not owned by caller',
+    type: ErrorResponseDto,
+  })
+  @ApiResponse({
+    status: 409,
+    description: 'Task was modified concurrently',
+    type: ErrorResponseDto,
   })
   async update(
     @CurrentUser() user: SafeUser,
@@ -142,14 +163,17 @@ export class TasksController {
   @ApiResponse({
     status: 400,
     description: 'Malformed or invalid UUID',
+    type: ErrorResponseDto,
   })
   @ApiResponse({
     status: 401,
     description: 'Missing or invalid authentication token',
+    type: ErrorResponseDto,
   })
   @ApiResponse({
     status: 404,
     description: 'Task not found or parent project not owned by caller',
+    type: ErrorResponseDto,
   })
   async delete(
     @CurrentUser() user: SafeUser,

@@ -23,6 +23,8 @@ import { ProjectsService, PaginatedProjectsResponse } from './projects.service';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { ProjectQueryDto } from './dto/project-query.dto';
+import { ProjectResponseDto, PaginatedProjectsResponseDto } from './dto/project-response.dto';
+import { ErrorResponseDto } from '../common/dto/error-response.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { SafeUser } from '../auth/auth.service';
@@ -41,14 +43,17 @@ export class ProjectsController {
   @ApiResponse({
     status: 201,
     description: 'Project successfully created',
+    type: ProjectResponseDto,
   })
   @ApiResponse({
     status: 400,
     description: 'Validation failed or malformed date range',
+    type: ErrorResponseDto,
   })
   @ApiResponse({
     status: 401,
     description: 'Missing or invalid authentication token',
+    type: ErrorResponseDto,
   })
   async create(
     @CurrentUser() user: SafeUser,
@@ -62,10 +67,12 @@ export class ProjectsController {
   @ApiResponse({
     status: 200,
     description: 'Projects retrieved successfully with pagination metadata',
+    type: PaginatedProjectsResponseDto,
   })
   @ApiResponse({
     status: 401,
     description: 'Missing or invalid authentication token',
+    type: ErrorResponseDto,
   })
   async findAll(
     @CurrentUser() user: SafeUser,
@@ -80,18 +87,22 @@ export class ProjectsController {
   @ApiResponse({
     status: 200,
     description: 'Project details retrieved successfully',
+    type: ProjectResponseDto,
   })
   @ApiResponse({
     status: 400,
     description: 'Malformed or invalid UUID',
+    type: ErrorResponseDto,
   })
   @ApiResponse({
     status: 401,
     description: 'Missing or invalid authentication token',
+    type: ErrorResponseDto,
   })
   @ApiResponse({
     status: 404,
     description: 'Project not found or not owned by caller',
+    type: ErrorResponseDto,
   })
   async findById(
     @CurrentUser() user: SafeUser,
@@ -106,18 +117,27 @@ export class ProjectsController {
   @ApiResponse({
     status: 200,
     description: 'Project successfully updated',
+    type: ProjectResponseDto,
   })
   @ApiResponse({
     status: 400,
     description: 'Validation failed or invalid effective date range',
+    type: ErrorResponseDto,
   })
   @ApiResponse({
     status: 401,
     description: 'Missing or invalid authentication token',
+    type: ErrorResponseDto,
   })
   @ApiResponse({
     status: 404,
     description: 'Project not found or not owned by caller',
+    type: ErrorResponseDto,
+  })
+  @ApiResponse({
+    status: 409,
+    description: 'Serialization conflict during concurrent update',
+    type: ErrorResponseDto,
   })
   async update(
     @CurrentUser() user: SafeUser,
@@ -138,14 +158,17 @@ export class ProjectsController {
   @ApiResponse({
     status: 400,
     description: 'Malformed or invalid UUID',
+    type: ErrorResponseDto,
   })
   @ApiResponse({
     status: 401,
     description: 'Missing or invalid authentication token',
+    type: ErrorResponseDto,
   })
   @ApiResponse({
     status: 404,
     description: 'Project not found or not owned by caller',
+    type: ErrorResponseDto,
   })
   async delete(
     @CurrentUser() user: SafeUser,

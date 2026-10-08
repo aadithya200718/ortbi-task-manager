@@ -491,7 +491,11 @@ describe('Post-Codex Security Repairs (F1-F5, F7-F9)', () => {
       });
 
       const syntheticPassword = 'SUPER_SENSITIVE_SECRET_XYZ123';
-      const syntheticJwt = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.doNotLeakThisSignaturePart';
+      const syntheticJwt = [
+        Buffer.from(JSON.stringify({ alg: 'HS256', typ: 'JWT' })).toString('base64url'),
+        Buffer.from(JSON.stringify({ sub: 'synthetic-test-user' })).toString('base64url'),
+        'synthetic-test-signature-segment',
+      ].join('.');
       const syntheticDb = 'postgresql://postgres:secret_password@localhost:5433/orbit_dev?schema=public';
 
       // Send bad request or trigger error filter with sensitive input in message/stack
