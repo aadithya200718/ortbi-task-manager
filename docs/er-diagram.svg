@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="760" viewBox="0 0 1280 760" role="img" aria-labelledby="title desc">
+  <title id="title">Orbit database entity-relationship diagram</title>
+  <desc id="desc">User has many Projects, and Project has many Tasks.</desc>
+  <style>
+    .bg { fill: #09090b; }
+    .card { fill: #111116; stroke: #3f3f4a; stroke-width: 2; }
+    .head { fill: #1d214e; }
+    .title { fill: #ffffff; font: 700 25px system-ui, sans-serif; }
+    .field { fill: #d4d4dc; font: 16px ui-monospace, SFMono-Regular, Consolas, monospace; }
+    .key { fill: #8997ff; font-weight: 700; }
+    .relation { stroke: #6574ff; stroke-width: 3; fill: none; }
+    .label { fill: #aeb6ff; font: 700 16px system-ui, sans-serif; }
+    .note { fill: #9999a6; font: 14px system-ui, sans-serif; }
+  </style>
+  <rect class="bg" width="1280" height="760" rx="24" />
+
+  <g transform="translate(55 110)">
+    <rect class="card" width="330" height="350" rx="16" />
+    <path class="head" d="M16 0h298a16 16 0 0 1 16 16v54H0V16A16 16 0 0 1 16 0z" />
+    <text class="title" x="24" y="44">User</text>
+    <text class="field key" x="24" y="105">PK  id: UUID</text>
+    <text class="field" x="24" y="140">fullName: String</text>
+    <text class="field" x="24" y="175">email: String (unique)</text>
+    <text class="field" x="24" y="210">passwordHash: String</text>
+    <text class="field" x="24" y="245">createdAt: DateTime</text>
+    <text class="field" x="24" y="280">updatedAt: DateTime</text>
+  </g>
+
+  <g transform="translate(475 60)">
+    <rect class="card" width="330" height="500" rx="16" />
+    <path class="head" d="M16 0h298a16 16 0 0 1 16 16v54H0V16A16 16 0 0 1 16 0z" />
+    <text class="title" x="24" y="44">Project</text>
+    <text class="field key" x="24" y="105">PK  id: UUID</text>
+    <text class="field key" x="24" y="140">FK  userId: UUID</text>
+    <text class="field" x="24" y="175">name: String</text>
+    <text class="field" x="24" y="210">description: String?</text>
+    <text class="field" x="24" y="245">status: ProjectStatus</text>
+    <text class="field" x="24" y="280">startDate: Date?</text>
+    <text class="field" x="24" y="315">endDate: Date?</text>
+    <text class="field" x="24" y="350">createdAt: DateTime</text>
+    <text class="field" x="24" y="385">updatedAt: DateTime</text>
+    <text class="note" x="24" y="445">UNIQUE (id, userId)</text>
+  </g>
+
+  <g transform="translate(895 45)">
+    <rect class="card" width="330" height="535" rx="16" />
+    <path class="head" d="M16 0h298a16 16 0 0 1 16 16v54H0V16A16 16 0 0 1 16 0z" />
+    <text class="title" x="24" y="44">Task</text>
+    <text class="field key" x="24" y="105">PK  id: UUID</text>
+    <text class="field key" x="24" y="140">FK  projectId: UUID</text>
+    <text class="field" x="24" y="175">name: String</text>
+    <text class="field" x="24" y="210">description: String?</text>
+    <text class="field" x="24" y="245">priority: TaskPriority</text>
+    <text class="field" x="24" y="280">status: TaskStatus</text>
+    <text class="field" x="24" y="315">dueDate: Date?</text>
+    <text class="field" x="24" y="350">completedAt: DateTime?</text>
+    <text class="field" x="24" y="385">createdAt: DateTime</text>
+    <text class="field" x="24" y="420">updatedAt: DateTime</text>
+  </g>
+
+  <path class="relation" d="M385 270H475" />
+  <circle cx="395" cy="270" r="5" fill="#6574ff" />
+  <text class="label" x="400" y="250">1</text>
+  <text class="label" x="448" y="250">N</text>
+  <text class="note" x="393" y="300">owns</text>
+
+  <path class="relation" d="M805 270H895" />
+  <circle cx="815" cy="270" r="5" fill="#6574ff" />
+  <text class="label" x="820" y="250">1</text>
+  <text class="label" x="868" y="250">N</text>
+  <text class="note" x="813" y="300">contains</text>
+
+  <text class="note" x="55" y="670">Foreign keys: Project.userId → User.id · Task.projectId → Project.id</text>
+  <text class="note" x="55" y="700">Referential action: ON DELETE CASCADE for both relationships</text>
+</svg>

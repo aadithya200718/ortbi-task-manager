@@ -1,229 +1,309 @@
-# Orbit — Project & Task Manager
+<div align="center">
+  <img src="docs/assets/orbit-logo.png" alt="Orbit logo" width="104" />
 
-A secure, production-grade cross-platform project and task management system built with Next.js 16, React Native Expo SDK 57, NestJS, Prisma ORM, and PostgreSQL.
+# Orbit
+
+**A secure, cross-platform workspace for planning projects, prioritizing tasks, and tracking progress.**
+
+Next.js · React Native / Expo · NestJS · PostgreSQL · TypeScript
+
+[Live Web App](https://ortbi-task-manager.vercel.app) · [Swagger API](https://orbit-api-9uh5.onrender.com/api/docs) · [API Health](https://orbit-api-9uh5.onrender.com/api/health)
+</div>
 
 ---
 
 ## Overview
 
-Orbit is a full-stack project and task management application designed for individual and team productivity. It empowers users to manage projects, organize prioritized tasks, track real-time completion analytics, and access their data with strict user isolation across web and mobile platforms.
+Orbit is a full-stack project and task management application delivered through a responsive Next.js web client and an Expo Android client. Registration, authentication, projects, tasks, and dashboard analytics are served by one NestJS REST API and persisted in one PostgreSQL database.
 
----
+The repository emphasizes production engineering as much as product functionality: server-side ownership checks, strict validation, bounded serializable transactions, migration tracking, secure client session handling, deterministic pagination, and cross-platform contract sharing are built into the implementation.
 
-## Architecture & Technology Stack
+The production topology uses Vercel for the web client, Render for the API, and Neon for PostgreSQL. Both clients operate against the same deployed backend and data model.
 
-Orbit follows a monorepo architecture with a unified backend:
+## Product Preview
 
-- **Monorepo:** pnpm workspaces
-- **Backend API:** NestJS 10, TypeScript strict mode, Express, Passport JWT, Helmet, Throttler rate limiting
-- **Database & ORM:** PostgreSQL, Prisma ORM 6 with migration tracking
-- **Web Client:** Next.js 16 (App Router, Turbopack), React 19, Tailwind CSS, TanStack Query
-- **Mobile Client:** React Native, Expo SDK 57, Expo Router
-- **Testing:** Jest, Supertest, PostgreSQL-backed integration test suite (146 passing tests)
-- **API Documentation:** OpenAPI / Swagger UI at `/api/docs`
+### Web experience
 
----
+| Authentication | Project workspace |
+| --- | --- |
+| <img src="docs/screenshots/final/web-login.png" alt="Orbit web login" width="100%" /> | <img src="docs/screenshots/final/web-project-detail.png" alt="Orbit web project detail" width="100%" /> |
 
-## Database Architecture & Isolation
+### Mobile workspace
 
-Orbit uses PostgreSQL with Prisma ORM.
+| Dashboard | Projects | Tasks |
+| --- | --- | --- |
+| <img src="docs/screenshots/final/mobile-dashboard.png" alt="Orbit Android dashboard" width="260" /> | <img src="docs/screenshots/final/mobile-projects.png" alt="Orbit Android projects" width="260" /> | <img src="docs/screenshots/final/mobile-tasks.png" alt="Orbit Android tasks" width="260" /> |
 
-### Databases: `orbit_dev` vs `orbit_test`
+| Project detail | Task filters | Create task |
+| --- | --- | --- |
+| <img src="docs/screenshots/final/mobile-project-detail.png" alt="Orbit Android project detail" width="260" /> | <img src="docs/screenshots/final/mobile-task-filters.png" alt="Orbit Android task filters" width="260" /> | <img src="docs/screenshots/final/mobile-create-task.png" alt="Orbit Android create task form" width="260" /> |
 
-1. **Development Database (`orbit_dev`):**
-   - Stores regular development data.
-   - Preserves user accounts and test projects across app runs.
-   - Connection URL: `DATABASE_URL=postgresql://postgres:postgres@localhost:5433/orbit_dev?schema=public`
+### Authentication experience
 
-2. **Dedicated Test Database (`orbit_test`):**
-   - Dedicated isolated database used exclusively for automated tests.
-   - All 146 integration tests run against `orbit_test`.
-   - The test runner fails closed if `TEST_DATABASE_URL` is missing or points to `orbit_dev` or production.
-   - Development data is never touched or deleted during test runs.
-   - Connection URL: `TEST_DATABASE_URL=postgresql://postgres:postgres@localhost:5433/orbit_test?schema=public`
+| Sign in | Create account |
+| --- | --- |
+| <img src="docs/screenshots/final/mobile-login.png" alt="Orbit Android login" width="320" /> | <img src="docs/screenshots/final/mobile-register.png" alt="Orbit Android registration" width="320" /> |
 
-### Database Migrations
+### Resilience / offline handling
 
-Apply database migrations to `orbit_dev`:
-```bash
-pnpm --filter @orbit/api exec prisma migrate deploy
+<img src="docs/screenshots/final/mobile-offline.png" alt="Orbit Android offline recovery state" width="320" />
+
+> Orbit is actively evolving. Screenshots reflect verified implementations at the time of capture and may differ from later UI iterations as usability and presentation continue to improve.
+
+## Core Capabilities
+
+| Area | Capabilities |
+| --- | --- |
+| Authentication | Registration, login, stateless logout, `/auth/me` session restoration, expired-session recovery |
+| Projects | Create, read, update, delete, status tracking, date ranges, search, filtering, sorting, pagination |
+| Tasks | Create, read, update, delete, priorities, workflow status, completion timestamps, due dates, search and filters |
+| Dashboard | User-scoped project/task totals, active-work indicators, completion analytics, recent projects |
+| Mobile | Native navigation, secure token storage, pull-to-refresh, offline states, shared production data |
+
+## Architecture
+
+```mermaid
+flowchart LR
+    User((User)) --> Web[Next.js Web]
+    User --> Mobile[React Native / Expo Android]
+    Web -->|HTTPS / REST| API[NestJS API]
+    Mobile -->|HTTPS / REST| API
+    API --> Prisma[Prisma ORM]
+    Prisma --> DB[(PostgreSQL)]
+
+    Web -. deployed on .-> Vercel[Vercel]
+    API -. deployed on .-> Render[Render]
+    DB -. hosted by .-> Neon[Neon]
 ```
 
-Check migration status:
-```bash
-pnpm --filter @orbit/api exec prisma migrate status
+The web and Android clients share the same authentication model, REST resources, backend authorization, and PostgreSQL data. Domain types and reusable validation utilities live in workspace packages so the client contracts remain aligned with the API.
+
+See [Architecture](docs/architecture.md) for request flow, trust boundaries, and deployment details, and [ER Diagram](docs/er-diagram.md) for the relational model.
+
+## Assessment Requirement Coverage
+
+The following mapping is based on the current source and deployable repository—not on planned functionality.
+
+| Requirement | Status | Evidence |
+| --- | --- | --- |
+| Web application | Implemented | Next.js application in `apps/web` |
+| Android application | Implemented | React Native / Expo application in `apps/mobile` |
+| One shared backend | Implemented | Both clients call the NestJS API in `apps/api` |
+| One shared database | Implemented | API-only Prisma access to PostgreSQL |
+| Registration, login, logout | Implemented | Auth endpoints and both client flows |
+| Same account across web/mobile | Implemented | Shared JWT identity and production API |
+| Project CRUD | Implemented | Authenticated `/api/projects` resource |
+| Task CRUD | Implemented | Authenticated `/api/tasks` resource |
+| Mark task complete | Implemented | Task status update with `completedAt` lifecycle |
+| Dashboard statistics | Implemented | User-scoped `/api/dashboard` summary |
+| Project search and status filter | Implemented | Validated project query DTO |
+| Task search, status, and priority filters | Implemented | Validated task query DTO |
+| Sorting and pagination | Implemented | Project/task list queries with deterministic tie-breakers |
+| Mobile pull-to-refresh | Implemented | Refresh controls on mobile data screens |
+| Secure device token storage | Implemented | Expo SecureStore with device-only protection |
+| Expired token handling | Implemented | Centralized 401 handling clears local sessions |
+| Offline handling | Implemented | Typed network failures, recovery UI, and retry actions |
+| Responsive web UI | Implemented | Responsive Next.js layouts and navigation |
+| Mobile navigation | Implemented | Expo Router auth and application routes |
+| Backend validation | Implemented | Global strict `ValidationPipe` and DTO constraints |
+| Error handling and safe logging | Implemented | Global exception filtering, redaction, request metadata logging |
+| CORS and security headers | Implemented | Exact configured web origin and Helmet middleware |
+| bcrypt and JWT authentication | Implemented | bcrypt cost 12 and Passport JWT |
+| Protected routes | Implemented | JWT guards on user data endpoints |
+| Anti-IDOR ownership authorization | Implemented | Queries scope projects/tasks through authenticated user ownership |
+| SQL injection resistance | Implemented | Prisma parameterized database access; no raw user-built SQL |
+| Authentication rate limiting | Implemented | NestJS Throttler with stricter auth limits |
+| Required REST resources | Implemented | Auth, projects, tasks, dashboard, and health endpoints |
+| API documentation | Implemented | Swagger/OpenAPI at `/api/docs` and [API reference](docs/api.md) |
+| Environment and database setup | Implemented | Sanitized env templates, migrations, and local setup below |
+| Mobile against deployed backend | Implemented | Configurable `EXPO_PUBLIC_API_URL` targets the shared API |
+
+## Submission Links
+
+| Artifact | Link |
+| --- | --- |
+| Web application | [ortbi-task-manager.vercel.app](https://ortbi-task-manager.vercel.app) |
+| Backend API | [orbit-api-9uh5.onrender.com](https://orbit-api-9uh5.onrender.com) |
+| Swagger documentation | [Open Swagger UI](https://orbit-api-9uh5.onrender.com/api/docs) |
+| API health | [Check API and database health](https://orbit-api-9uh5.onrender.com/api/health) |
+| Android APK / Expo build | **ADD BEFORE SUBMISSION** |
+| Demo video | **ADD BEFORE SUBMISSION** |
+| ER diagram | [View database model](docs/er-diagram.md) |
+
+## Security Engineering
+
+- **Authentication:** Passport JWT protects private routes; user identity is taken from the verified token rather than request-supplied ownership fields.
+- **Password handling:** bcrypt uses cost factor 12. Registration and login enforce bcrypt's 72-byte limit using UTF-8 byte length, not JavaScript character count.
+- **Authorization:** project and task lookups are scoped to the authenticated user. Cross-user identifiers resolve as not found, preventing direct-object-reference access.
+- **Input and transport controls:** strict DTO validation rejects unknown properties, Helmet applies security headers, CORS is restricted to the configured web origin, and throttling limits general and authentication traffic.
+- **Safe observability:** the global error path redacts bearer tokens, JWTs, database URLs, password hashes, and secret-like fields; request logs contain operational metadata rather than credentials.
+- **Client sessions:** the web token is session-scoped; Android stores its token with Expo SecureStore using device-only protection. Both clients clear invalid sessions after unauthorized responses.
+- **Test isolation:** API integration tests fail closed without a dedicated `TEST_DATABASE_URL` and reject development or production targets.
+
+Read the complete [security policy and model](SECURITY.md).
+
+## Reliability & Data Integrity
+
+- Project and task mutations use PostgreSQL `Serializable` transactions with a bounded retry policy for recognized write conflicts.
+- `completedAt` is set when a task enters `COMPLETED` and cleared when it leaves that state.
+- Foreign keys model `User → Project → Task`; database cascades remove dependent projects or tasks with their parent.
+- List endpoints use a stable `id` tie-breaker after the selected sort field, keeping pagination deterministic.
+- Prisma migrations are committed and deployed as versioned schema changes.
+- Health reporting checks database connectivity in addition to API process availability.
+
+## Cross-Platform Architecture
+
+| Layer | Role |
+| --- | --- |
+| Next.js web | Responsive browser client and session-scoped authentication |
+| React Native / Expo | Android client, native navigation, secure storage, offline recovery |
+| NestJS | Shared REST API, authentication, authorization, validation, domain behavior |
+| PostgreSQL / Prisma | Shared relational data model, constraints, transactions, migrations |
+
+Both client applications consume the same authentication, project, task, and dashboard contracts. There is no client-specific secondary backend or database.
+
+## Testing & Quality
+
+Results from the final documentation audit:
+
+| Suite | Verified result |
+| --- | --- |
+| Web client | **13 tests passing** |
+| Mobile client | **9 tests passing** |
+| API integration | Suite present; requires an isolated PostgreSQL `TEST_DATABASE_URL`. It was not counted as passing because that service was unavailable in the audit environment. |
+
+| Quality gate | API | Web | Mobile |
+| --- | --- | --- | --- |
+| TypeScript | Passed | Passed | Passed |
+| Lint | Passed | Passed | Passed |
+| Build | Passed | Passed | N/A (Expo client) |
+
+The API integration harness validates its database target before running destructive test setup. This protects development and production data at the cost of requiring an intentionally provisioned test database.
+
+## API
+
+- **Production base:** `https://orbit-api-9uh5.onrender.com/api`
+- **Swagger:** [https://orbit-api-9uh5.onrender.com/api/docs](https://orbit-api-9uh5.onrender.com/api/docs)
+- **Health:** [https://orbit-api-9uh5.onrender.com/api/health](https://orbit-api-9uh5.onrender.com/api/health)
+
+| Group | Purpose |
+| --- | --- |
+| `/api/auth` | Register, login, current user, logout |
+| `/api/projects` | User-owned project CRUD and list queries |
+| `/api/tasks` | User-owned task CRUD, completion, and list queries |
+| `/api/dashboard` | Authenticated summary statistics |
+| `/api/health` | Process and database readiness |
+
+Detailed contracts are documented in [docs/api.md](docs/api.md).
+
+## Technology Stack
+
+| Layer | Technology |
+| --- | --- |
+| Monorepo | pnpm workspaces, TypeScript |
+| Web | Next.js 16, React 19, Tailwind CSS, TanStack Query |
+| Mobile | React Native, Expo SDK 57, Expo Router, SecureStore, TanStack Query |
+| Backend | NestJS 10, Passport JWT, class-validator, Swagger/OpenAPI |
+| Database | PostgreSQL, Prisma ORM 6, Prisma migrations |
+| Security | bcrypt, Helmet, CORS, NestJS Throttler, server-side ownership checks |
+| Testing | Jest, Supertest, React Testing Library |
+| Infrastructure | Vercel, Render, Neon |
+
+## Repository Structure
+
+```text
+apps/
+  api/          # NestJS REST API, Prisma schema, migrations, integration tests
+  web/          # Next.js browser application
+  mobile/       # React Native / Expo Android application
+packages/
+  types/        # Shared domain and API types
+  validation/   # Shared validation utilities
+docs/
+  assets/       # Repository media
+  screenshots/  # Current and archived verified product captures
+  api.md        # Endpoint reference
+  architecture.md
+  er-diagram.md
+  implementation.md
 ```
 
----
+## Local Development
 
-## API Specifications & Endpoints
+### Requirements
 
-- **Base URL:** `http://localhost:4000/api`
-- **Interactive Swagger Documentation:** `http://localhost:4000/api/docs`
+- Node.js 22+
+- pnpm 10+
+- PostgreSQL
 
-### Core Endpoints
-
-#### Authentication (`/api/auth`)
-- `POST /api/auth/register` — Register new user account.
-  - Enforces unique email, minimum 8 characters, and maximum 72 UTF-8 bytes (bcrypt limit).
-- `POST /api/auth/login` — Authenticate and receive JWT access token.
-  - Enforces maximum 72 UTF-8 bytes.
-- `GET /api/auth/me` — Fetch currently authenticated user profile (Bearer token required).
-- `POST /api/auth/logout` — Stateless logout endpoint. Client discards token from `sessionStorage`.
-
-#### Projects (`/api/projects`)
-- `GET /api/projects` — Paginated project listing with search, status filtering, and deterministic sorting (`orderBy: [{ [sortBy]: sortOrder }, { id: 'desc' }]`).
-- `POST /api/projects` — Create project owned by caller (`userId` extracted from JWT).
-- `GET /api/projects/:id` — Fetch project by ID (IDOR-protected).
-- `PUT /api/projects/:id` — Update project with Serializable transaction isolation and date range validation.
-- `DELETE /api/projects/:id` — Delete project. **Cascading behavior:** Deleting a project automatically deletes all child tasks via PostgreSQL `ON DELETE CASCADE`.
-
-#### Tasks (`/api/tasks`)
-- `GET /api/tasks` — Paginated task list with project, status, priority filters and search.
-- `POST /api/tasks` — Create task with atomic parent relation connection (`project: { connect: { id_userId } }`).
-- `GET /api/tasks/:id` — Fetch task details with relational ownership verification.
-- `PUT /api/tasks/:id` — Update task with Serializable transaction isolation.
-  - **Reassignment restriction:** Task `projectId` cannot be reassigned during updates.
-  - **Completion Lifecycle:**
-    - Transition to `COMPLETED`: sets `completedAt` to current timestamp.
-    - Reopening to non-completed status: clears `completedAt` to `null`.
-    - Unchanged `COMPLETED` status: preserves original `completedAt`.
-- `DELETE /api/tasks/:id` — Delete task.
-
-#### Dashboard (`/api/dashboard`)
-- `GET /api/dashboard` — Returns real-time user-scoped counts (`totalProjects`, `projectsNotStarted`, `projectsInProgress`, `projectsCompleted`, `totalTasks`, `pendingTasks`, `inProgressTasks`, `completedTasks`, `taskCompletionRate`).
-
----
-
-## Security & Architecture Highlights
-
-1. **Strict User Scoping (Anti-IDOR):**
-   - `userId` is never accepted in request bodies or query parameters.
-   - All mutations and queries filter by the authenticated user's ID from the JWT payload.
-2. **Bcrypt 72-Byte UTF-8 Enforcement:**
-   - Both registration and login DTOs enforce a strict 72 UTF-8 byte maximum via `@MaxUtf8Bytes(72)` to prevent silent password truncation.
-   - Bcrypt cost factor is configured to 12.
-3. **Concurrency-Safe Transitions:**
-   - Project and task updates utilize PostgreSQL `Serializable` transaction isolation with bounded retries (maximum 3 attempts) to prevent race conditions.
-4. **Sanitized Error Logging:**
-   - Error filters automatically redact passwords, hashes, JWT tokens, and database credentials from application logs.
-5. **Token Storage & Stateless Logout:**
-   - Access tokens are stored in browser `sessionStorage` and sent via `Authorization: Bearer <token>`.
-   - Logout is stateless: the client clears `sessionStorage` and auth state.
-
----
-
-## Environment Configuration
-
-Copy `apps/api/.env.example` to `apps/api/.env` for the API. Put the public web API URL in `apps/web/.env.local`. Real `.env` files are ignored by Git.
-
-```env
-# Database
-DATABASE_URL=postgresql://postgres:postgres@localhost:5433/orbit_dev?schema=public
-TEST_DATABASE_URL=postgresql://postgres:postgres@localhost:5433/orbit_test?schema=public
-
-# Authentication Secrets
-JWT_SECRET=your_secure_256_bit_secret_here
-JWT_EXPIRES_IN=1h
-
-# Backend Configuration
-PORT=4000
-API_PORT=4000
-WEB_ORIGIN=http://localhost:3000
-
-# Client Configuration
-NEXT_PUBLIC_API_URL=http://localhost:4000/api
-EXPO_PUBLIC_API_URL=http://localhost:4000/api
-```
-
-`PORT` is the production-platform port and takes precedence. `API_PORT` remains the local fallback. `WEB_ORIGIN` must be the deployed web origin, without a trailing path. Public client API URLs must include the `/api` prefix.
-
----
-
-## Local Setup
-
-Prerequisites: Node.js, pnpm, and PostgreSQL.
+### Setup
 
 ```bash
 pnpm install
-cp apps/api/.env.example apps/api/.env
-```
-
-Create the development and test databases named by `DATABASE_URL` and `TEST_DATABASE_URL`, replace all placeholders in `apps/api/.env`, then generate the Prisma client and apply migrations:
-
-```bash
-pnpm --filter @orbit/api prisma:generate
+cp .env.example .env
+pnpm --filter @orbit/api exec prisma generate
 pnpm --filter @orbit/api exec prisma migrate deploy
 ```
 
-Run the API and web client in separate terminals:
+Start each application in a separate terminal:
 
 ```bash
 pnpm dev:api
 pnpm dev:web
+pnpm dev:mobile
 ```
 
-For the Expo Android client, set `EXPO_PUBLIC_API_URL` to an API address reachable from the device or emulator, then run `pnpm dev:mobile`.
+For a physical Android device, set `EXPO_PUBLIC_API_URL` to an API address reachable from that device. API integration tests require a separate PostgreSQL database through `TEST_DATABASE_URL`.
 
----
+## Environment Variables
+
+Use local `.env` files or deployment-provider secret stores. Never commit real credentials.
+
+```dotenv
+DATABASE_URL=postgresql://USER:PASSWORD@HOST:PORT/DATABASE
+TEST_DATABASE_URL=postgresql://USER:PASSWORD@HOST:PORT/DATABASE_test
+JWT_SECRET=replace_me_with_a_long_random_secret
+JWT_EXPIRES_IN=1h
+WEB_ORIGIN=http://localhost:3000
+NEXT_PUBLIC_API_URL=http://localhost:4000/api
+EXPO_PUBLIC_API_URL=http://DEVICE_REACHABLE_API:4000/api
+```
+
+See the tracked `.env.example` files for the complete sanitized template.
 
 ## Deployment
 
-### API
+- **Web:** Vercel builds the Next.js workspace and injects `NEXT_PUBLIC_API_URL`.
+- **API:** Render builds and runs the NestJS service with provider-managed production secrets.
+- **Database:** Neon hosts PostgreSQL; Prisma migrations are applied through the API deployment workflow.
+- **Mobile:** Expo reads `EXPO_PUBLIC_API_URL` at build/start time to use the same deployed API.
 
-1. Provision PostgreSQL and set `DATABASE_URL` to its production connection string.
-2. Set a strong, unique `JWT_SECRET`, plus `JWT_EXPIRES_IN`, `WEB_ORIGIN`, and the platform-provided `PORT`. Do not set `TEST_DATABASE_URL` in production unless the platform separately runs the test suite against an isolated database.
-3. Install dependencies with `pnpm install --frozen-lockfile`, generate the Prisma client with `pnpm --filter @orbit/api prisma:generate`, and build with `pnpm build:api`.
-4. Apply committed migrations with `pnpm --filter @orbit/api exec prisma migrate deploy`.
-5. Start with `pnpm --filter @orbit/api start:prod`.
-6. Configure the service health check to request `/api/health`.
+## Beyond the Minimum Requirements
 
-The API listens on `0.0.0.0` and prefers `PORT`, with `API_PORT` as a fallback.
+- Isolated PostgreSQL-backed API integration suite with fail-closed database safeguards
+- Web and mobile client test suites
+- Deterministic pagination and multi-field sorting
+- Shared domain types and validation workspace packages
+- Mobile offline recovery, secure device token storage, and pull-to-refresh
+- Automated CI quality gates for API, web, mobile, and shared packages
 
-### Web
+## UI / UX Development Status
 
-1. Set `NEXT_PUBLIC_API_URL` to the public API base URL, including `/api`, before building.
-2. Build with `pnpm build:web`.
-3. Start with `pnpm --filter @orbit/web start`; the hosting platform may supply Next.js with its own `PORT`.
+Orbit is under active product development, and its interface continues to evolve through iterative UI/UX refinement.
 
-Serve both applications over HTTPS. Set `WEB_ORIGIN` to the exact public web origin so browser requests pass CORS checks.
+The screenshots in this repository represent verified product states at the time they were captured. Future iterations may refine layout density, navigation, visual hierarchy, spacing, responsive behavior, and component styling while preserving the underlying API contracts, security model, database architecture, and core application behavior.
 
----
+Recent interface work has focused on improving information density, task and project scanning, consistency between web and Android, responsive layouts, visual hierarchy, and unnecessary interface complexity. UI evolution is treated as continuous product refinement rather than a change to the underlying architecture.
 
-## Development & Testing Commands
+## Documentation
 
-### Backend API
-```bash
-# Start backend dev server
-pnpm --filter @orbit/api dev
+- [Architecture](docs/architecture.md)
+- [API reference](docs/api.md)
+- [ER diagram](docs/er-diagram.md)
+- [Historical implementation plan](docs/implementation.md)
+- [Security policy](SECURITY.md)
 
-# Run all 146 integration tests against orbit_test
-pnpm --filter @orbit/api test
+## Author
 
-# Typecheck and lint API
-pnpm --filter @orbit/api typecheck
-pnpm --filter @orbit/api lint
-
-# Build API bundle
-pnpm --filter @orbit/api build
-```
-
-### Web Application
-```bash
-# Start Next.js development server
-pnpm --filter @orbit/web dev
-
-# Typecheck and lint web application
-pnpm --filter @orbit/web typecheck
-pnpm --filter @orbit/web lint
-
-# Build production Next.js application
-pnpm --filter @orbit/web build
-```
-
-### Workspace-wide Checks
-```bash
-pnpm typecheck
-pnpm lint
-pnpm build
-```
+**Manaadithya S.**<br>
+Computer Science · SRM University

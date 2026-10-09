@@ -1,6 +1,8 @@
 # ISMO Bio-Photonics Full Stack Developer Assessment
 # Complete Implementation Plan
 
+> **Historical planning document:** This file records the original implementation roadmap and may contain phase-oriented or pre-production wording. For the current deployed architecture, use [architecture.md](architecture.md); for verified project status and setup, use the repository [README](../README.md).
+
 ## Project Name
 
 **Orbit — Cross-Platform Project & Task Management System**
@@ -1651,7 +1653,7 @@ Example backend:
 
 ```text
 DATABASE_URL=
-JWT_SECRET=
+JWT_SECRET=replace_me
 JWT_EXPIRES_IN=
 REFRESH_TOKEN_SECRET=
 WEB_ORIGIN=

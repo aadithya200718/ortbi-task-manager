@@ -1,7 +1,10 @@
 # Orbit API Documentation & Integration Contracts
 
-Base URL: `http://localhost:4000/api`
-Swagger Docs: `http://localhost:4000/api/docs`
+Production base URL: `https://orbit-api-9uh5.onrender.com/api`
+
+Local base URL: `http://localhost:4000/api`
+
+Production Swagger UI: `https://orbit-api-9uh5.onrender.com/api/docs`
 
 ---
 
@@ -38,7 +41,7 @@ Returns profile of the authenticated user.
   - `401 Unauthorized`: Missing, expired, or invalid token
 
 ### `POST /api/auth/logout`
-Stateless logout. Client is responsible for discarding the access token from `sessionStorage`.
+Stateless logout. Each client is responsible for discarding its locally stored access token.
 - **Headers:** `Authorization: Bearer <accessToken>`
 - **Responses:**
   - `200 OK`: `{ message: "Logged out successfully" }`

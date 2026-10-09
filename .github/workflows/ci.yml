@@ -1,0 +1,62 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    name: Typecheck, lint, test, and build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build shared packages
+        run: pnpm build:packages
+
+      - name: Verify API
+        run: |
+          pnpm --filter @orbit/api typecheck
+          pnpm --filter @orbit/api lint
+          pnpm --filter @orbit/api build
+
+      - name: Verify web client
+        run: |
+          pnpm --filter @orbit/web test
+          pnpm --filter @orbit/web typecheck
+          pnpm --filter @orbit/web lint
+          pnpm --filter @orbit/web build
+
+      - name: Verify mobile client
+        run: |
+          pnpm --filter @orbit/mobile test
+          pnpm --filter @orbit/mobile typecheck
+          pnpm --filter @orbit/mobile lint
+
+      - name: Verify shared packages
+        run: pnpm typecheck:packages
