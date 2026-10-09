@@ -48,7 +48,7 @@ export default function ProjectsPage() {
   return (
     <div className="min-w-0 space-y-7 overflow-hidden">
       <header className="flex items-end justify-between gap-4">
-        <div><h2 className="text-[28px] font-semibold leading-tight tracking-[-0.035em] sm:text-[32px]">Projects</h2><p className="mt-1.5 text-sm text-[#8b8b94]">Organize work by outcome and timeline.</p></div>
+        <div><h2 className="text-[28px] font-semibold leading-tight tracking-[-0.035em] sm:text-[32px]">Projects</h2><p className="mt-1.5 text-sm text-[#8b8b94]">Manage work, progress, and delivery across your projects.</p></div>
         <Button className="hidden sm:inline-flex" size="sm" onClick={openCreate}><Plus size={14} />New project</Button>
       </header>
 
@@ -96,7 +96,7 @@ function ProjectRow({ project, onEdit, onDelete }: { project: Project; onEdit: (
   const statusColor = project.status === 'COMPLETED' ? 'bg-emerald-400' : project.status === 'IN_PROGRESS' ? 'bg-[#5B6CFF]' : 'bg-[#71717A]';
   const dates = project.startDate || project.endDate ? `${project.startDate ? formatDate(project.startDate) : 'No start'} - ${project.endDate ? formatDate(project.endDate) : 'No end'}` : 'No dates';
   return (
-    <article className="group relative grid gap-3 px-2 py-4 transition-colors hover:bg-white/[0.018] md:grid-cols-[minmax(0,1fr)_140px_175px_70px] md:items-center md:gap-6">
+    <article className="group relative grid min-h-[64px] gap-3 px-2 py-3 transition-colors hover:bg-white/[0.026] md:grid-cols-[minmax(0,1fr)_140px_175px_70px] md:items-center md:gap-6">
       <Link href={`/projects/${project.id}`} className="absolute inset-0 focus:outline-none" aria-label={`View ${project.name}`} />
       <div className="min-w-0"><h3 className="truncate text-[15px] font-medium text-[#E8E8E6] transition-colors group-hover:text-white">{project.name}</h3><p className="mt-1 line-clamp-1 max-w-[68ch] text-xs leading-5 text-[#71717A]">{project.description || 'No description'}</p></div>
       <div className="flex items-center gap-2 text-xs text-[#A1A1AA]"><span className={`h-1.5 w-1.5 rounded-full ${statusColor}`} />{status}</div>

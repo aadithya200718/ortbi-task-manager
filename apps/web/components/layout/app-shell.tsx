@@ -58,7 +58,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex min-h-dvh bg-[#0A0A0B] text-[#F5F5F4]">
-      <aside className="fixed inset-y-0 left-0 z-30 hidden w-[192px] flex-col border-r border-white/[0.065] bg-[#0c0c0e] md:flex">
+      <aside className="fixed inset-y-0 left-0 z-30 hidden w-[224px] flex-col border-r border-white/[0.065] bg-[#0c0c0e] md:flex">
         <div className="flex h-[58px] items-center border-b border-white/[0.065] px-5">
           <Link href="/dashboard" className="focus-ring flex items-center gap-2.5 rounded-md" aria-label="Orbit dashboard">
             <OrbitMark size={22} />
@@ -67,6 +67,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </div>
 
         <nav className="flex-1 space-y-1 px-2.5 py-4" aria-label="Main navigation">
+          <p className="px-3 pb-2 pt-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-[#55555e]">Workspace</p>
           {navItems.map((item) => {
             const Icon = item.icon;
             return (
@@ -94,13 +95,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </div>
       </aside>
 
-      <div className="min-w-0 flex-1 md:pl-[192px]">
+      <div className="min-w-0 flex-1 md:pl-[224px]">
         <header className="sticky top-0 z-20 flex h-[58px] items-center justify-between border-b border-white/[0.065] bg-[#0A0A0B]/95 px-4 backdrop-blur-md sm:px-6 lg:px-8">
           <Link href="/dashboard" className="focus-ring flex items-center gap-2.5 rounded-md md:hidden" aria-label="Orbit dashboard">
             <OrbitMark size={22} />
             <span className="text-sm font-semibold tracking-[-0.02em]">Orbit</span>
           </Link>
-          <h1 className="hidden text-sm font-semibold tracking-[-0.01em] md:block">{sectionTitle}</h1>
+          <div className="hidden items-center gap-2 text-xs md:flex"><span className="text-[#64646d]">Workspace</span><span className="text-[#44444c]">/</span><h1 className="font-medium text-[#d4d4d8]">{sectionTitle}</h1></div>
           <div className="flex items-center gap-2">
             <button onClick={() => setCreateMenuOpen(true)} className="interactive-press focus-ring flex h-8 w-8 items-center justify-center rounded-lg bg-[#5B6CFF] text-white sm:hidden" aria-label="Create">
               <Plus size={16} />
@@ -109,7 +110,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </div>
         </header>
 
-        <main className="page-enter mx-auto w-full max-w-[1280px] px-4 pb-24 pt-6 sm:px-6 md:pb-10 lg:px-8 lg:pt-8">{children}</main>
+        <main className="page-enter mx-auto w-full max-w-[1400px] px-4 pb-24 pt-6 sm:px-6 md:pb-10 lg:px-8 lg:pt-7">{children}</main>
       </div>
 
       <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-white/[0.075] bg-[#0c0c0e]/96 pb-[env(safe-area-inset-bottom)] backdrop-blur-md md:hidden" aria-label="Mobile navigation">

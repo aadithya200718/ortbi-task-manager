@@ -70,10 +70,11 @@ export default function DashboardPage() {
       </header>
 
       <section aria-label="Workspace summary" className="border-y border-white/[0.075] py-5">
-        <div className="grid grid-cols-3 divide-x divide-white/[0.075]">
+        <div className="grid grid-cols-2 divide-x divide-y divide-white/[0.075] sm:grid-cols-4 sm:divide-y-0">
           <Metric value={stats?.totalTasks ?? 0} label="Tasks" detail={`${stats?.completedTasks ?? 0} completed`} />
           <Metric value={stats?.totalProjects ?? 0} label="Projects" detail={`${stats?.projectsInProgress ?? 0} active`} />
           <Metric value={`${Math.round(stats?.taskCompletionRate ?? 0)}%`} label="Complete" detail={`${stats?.completedTasks ?? 0} of ${stats?.totalTasks ?? 0} tasks`} />
+          <Metric value={stats?.inProgressTasks ?? 0} label="In progress" detail={`${stats?.pendingTasks ?? 0} pending`} />
         </div>
       </section>
 
@@ -122,7 +123,7 @@ export default function DashboardPage() {
 }
 
 function Metric({ value, label, detail }: { value: number | string; label: string; detail: string }) {
-  return <div className="px-3 first:pl-0 last:pr-0 sm:px-6"><div className="text-2xl font-semibold tracking-[-0.04em] tabular-nums sm:text-[28px]">{value}</div><div className="mt-1 text-xs font-medium text-[#A1A1AA]">{label}</div><div className="mt-0.5 hidden text-[11px] text-[#5f5f68] sm:block">{detail}</div></div>;
+  return <div className="px-3 py-3 first:pl-0 sm:px-6 sm:py-0"><div className="text-2xl font-semibold tracking-[-0.04em] tabular-nums sm:text-[28px]">{value}</div><div className="mt-1 text-xs font-medium text-[#A1A1AA]">{label}</div><div className="mt-0.5 hidden text-[11px] text-[#5f5f68] sm:block">{detail}</div></div>;
 }
 
 function SectionHeader({ title, href }: { title: string; href: string }) {
@@ -132,7 +133,7 @@ function SectionHeader({ title, href }: { title: string; href: string }) {
 function DashboardTaskRow({ task, projectName, onToggle, pending }: { task: Task; projectName?: string; onToggle: () => void; pending: boolean }) {
   const completed = task.status === 'COMPLETED';
   return (
-    <div className="group flex min-h-[64px] items-center gap-3 py-2">
+    <div className="group flex min-h-[56px] items-center gap-3 py-2">
       <button onClick={onToggle} disabled={pending} className={`interactive-press focus-ring flex h-5 w-5 shrink-0 items-center justify-center rounded-full border transition-[background-color,border-color,color] duration-[var(--motion-fast)] ${completed ? 'border-emerald-400/60 bg-emerald-400 text-[#07120d]' : 'border-white/25 text-transparent hover:border-[#7483ff]'}`} aria-label={completed ? `Reopen ${task.name}` : `Complete ${task.name}`}><Check className="h-3 w-3" strokeWidth={3} /></button>
       <div className="min-w-0 flex-1"><p className={`task-state-change truncate text-sm font-medium ${completed ? 'text-[#71717A] line-through decoration-white/20' : 'text-[#E8E8E6]'}`}>{task.name}</p><div className="mt-1 flex min-w-0 items-center gap-2 text-[11px] text-[#71717A]"><span className="truncate">{projectName || 'Project'}</span>{task.dueDate ? <><span aria-hidden="true">·</span><span className="flex shrink-0 items-center gap-1"><Clock size={11} />{formatDate(task.dueDate)}</span></> : null}{completed && task.completedAt ? <><span aria-hidden="true">·</span><span className="shrink-0 text-emerald-300/75">Completed {formatDate(task.completedAt)}</span></> : null}</div></div>
       <div className="hidden shrink-0 items-center gap-5 text-xs sm:flex"><span className={task.priority === 'HIGH' ? 'text-rose-300' : task.priority === 'MEDIUM' ? 'text-amber-300' : 'text-[#777781]'}>{task.priority.charAt(0) + task.priority.slice(1).toLowerCase()}</span><span className={task.status === 'COMPLETED' ? 'text-emerald-300' : task.status === 'IN_PROGRESS' ? 'text-[#8B98FF]' : 'text-[#8b8b94]'}>{task.status === 'IN_PROGRESS' ? 'In progress' : task.status.charAt(0) + task.status.slice(1).toLowerCase()}</span></div>

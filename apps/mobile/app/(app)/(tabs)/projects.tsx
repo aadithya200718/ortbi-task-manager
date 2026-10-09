@@ -43,5 +43,5 @@ export default function ProjectsScreen() {
 const styles = StyleSheet.create({
   controls: { gap: spacing.md }, filterPanel: { marginTop: spacing.md, padding: spacing.lg, gap: spacing.lg, borderWidth: 1, borderColor: colors.border, borderRadius: radius.lg, backgroundColor: colors.surface },
   resultsHeader: { minHeight: 58, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }, resultLabel: { color: colors.textMuted, fontSize: 12, fontWeight: '800', letterSpacing: 1, textTransform: 'uppercase' },
-  list: { gap: spacing.md }, end: { flexDirection: 'row', gap: 7, alignItems: 'center', justifyContent: 'center', paddingVertical: spacing.lg }, endText: { color: colors.textMuted, fontSize: 12 },
+  list: { gap: spacing.sm }, end: { flexDirection: 'row', gap: 7, alignItems: 'center', justifyContent: 'center', paddingVertical: spacing.lg }, endText: { color: colors.textMuted, fontSize: 12 },
 });
