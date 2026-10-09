@@ -80,6 +80,14 @@ The web and Android clients share the same authentication model, REST resources,
 
 See [Architecture](docs/architecture.md) for request flow, trust boundaries, and deployment details, and [ER Diagram](docs/er-diagram.md) for the relational model.
 
+### Data model and workflow
+
+The following overview traces Orbit from its web and mobile clients through authentication, the `User → Project → Task` ownership model, REST operations, and PostgreSQL persistence.
+
+<img src="docs/assets/orbit-data-model-workflow.png" alt="Orbit data model and cross-platform application workflow" width="100%" />
+
+For field-level keys, relationships, and cascade behavior, see the [detailed ER diagram](docs/er-diagram.md).
+
 ## Assessment Requirement Coverage
 
 The following mapping is based on the current source and deployable repository—not on planned functionality.
