@@ -36,6 +36,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Generate Prisma client
+        run: pnpm --filter @orbit/api exec prisma generate
+
       - name: Build shared packages
         run: pnpm build:packages
 
