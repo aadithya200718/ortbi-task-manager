@@ -1,7 +1,7 @@
 <div align="center">
   <img src="docs/assets/orbit-logo.png" alt="Orbit logo" width="104" />
 
-# Orbit
+ Orbit
 
 **A secure, cross-platform workspace for planning projects, prioritizing tasks, and tracking progress.**
 
