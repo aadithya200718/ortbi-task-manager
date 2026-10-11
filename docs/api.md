@@ -6,7 +6,7 @@ Local base URL: `http://localhost:4000/api`
 
 Production Swagger UI: `https://orbit-api-9uh5.onrender.com/api/docs`
 
----
+--
 
 # 1. Authentication
 
