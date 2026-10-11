@@ -8,7 +8,7 @@ Production Swagger UI: `https://orbit-api-9uh5.onrender.com/api/docs`
 
 ---
 
-## 1. Authentication
+# 1. Authentication
 
 ### `POST /api/auth/register`
 Creates a new user account.
